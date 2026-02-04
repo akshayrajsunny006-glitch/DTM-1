@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CodeBuddy | Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50">
+
+<nav class="bg-white shadow py-4 px-8 flex justify-between">
+  <h1 class="font-bold text-blue-600 text-xl">CODEBUDDY</h1>
+  <span class="text-gray-500">Dashboard</span>
+</nav>
+
+<main class="max-w-5xl mx-auto p-8">
+  <h3 class="text-xl font-bold mb-4">
+    <i class="fa-solid fa-tower-broadcast text-red-500"></i>
+    Project Beacons
+  </h3>
+
+  <div class="bg-white p-6 rounded-xl shadow mb-4">
+    <h4 class="font-bold text-lg">Cybersecurity Dashboard</h4>
+    <p class="text-sm text-gray-500">Backend ready • Frontend needed</p>
+    <p class="text-sm text-gray-600 mt-2">
+      Looking for React developer for visualization.
+    </p>
+    <button class="mt-4 text-blue-600 font-bold">Apply →</button>
+  </div>
+
+  <div class="bg-white p-6 rounded-xl shadow">
+    <h4 class="font-bold text-lg">Lost & Found Bot</h4>
+    <p class="text-sm text-gray-500">Node.js ready • DB help needed</p>
+    <p class="text-sm text-gray-600 mt-2">
+      Telegram bot for SRM campus.
+    </p>
+    <button class="mt-4 text-blue-600 font-bold">Apply →</button>
+  </div>
+</main>
+
+</body>
+</html>
+<script>
+  async function loadBeacons() {
+    const res = await fetch("http://localhost:5000/api/beacons");
+    const beacons = await res.json();
+
+    const container = document.querySelector("section");
+    container.innerHTML = "";
+
+    beacons.forEach(b => {
+      container.innerHTML += `
+        <div class="bg-white p-6 rounded-xl shadow-sm mb-4">
+          <h4 class="font-bold text-lg">${b.title}</h4>
+          <p class="text-sm text-gray-500">${b.description}</p>
+          <p class="text-xs text-blue-600 mt-2">
+            Skills Needed: ${b.skillsNeeded.join(", ")}
+          </p>
+          <button class="text-blue-600 font-bold mt-3">
+            Apply to Join →
+          </button>
+        </div>
+      `;
+    });
+  }
+
+  loadBeacons();
+</script>
+<script>
+  async function loadMatches() {
+   const userId = localStorage.getItem("userId");
+
+// Fetch Matches
+fetch("http://localhost:5000/api/users/match", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ userId })
+})
+.then(res => res.json())
+.then(users => {
+  const div = document.getElementById("matches");
+  users.forEach(u => {
+    div.innerHTML += `
+      <div class="border p-4 rounded">
+        <h3 class="font-bold">${u.name}</h3>
+        <p class="text-sm text-gray-500">Can Teach: ${u.canTeach.join(", ")}</p>
+      </div>`;
+  });
+});
+
+// Fetch Beacons
+fetch("http://localhost:5000/api/beacons")
+.then(res => res.json())
+.then(beacons => {
+  const div = document.getElementById("beacons");
+  beacons.forEach(b => {
+    div.innerHTML += `
+      <div class="border p-4 rounded">
+        <h3 class="font-bold">${b.title}</h3>
+        <p class="text-sm">${b.description}</p>
+        <p class="text-xs text-blue-600">Needs: ${b.skillsNeeded.join(", ")}</p>
+      </div>`;
+  });
+});
+fetch("http://localhost:5000/api/projects")
+  .then(res => res.json())
+  .then(projects => {
+    console.log(projects);
+  });
+fetch("http://localhost:5000/api/projects", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    title: "My Project",
+    description: "Need frontend dev",
+    requiredSkills: ["React"],
+    slots: 1,
+    createdBy: localStorage.getItem("userId")
+  })
+});
+
+fetch(`http://localhost:5000/api/match/${userId}`)
+  .then(res => res.json())
+  .then(matches => {
+    console.log(matches);
+  });
+
+
+fetch(`http://localhost:5000/api/users/${userId}`)
+  .then(res => res.json())
+  .then(user => {
+    console.log(user);
+  });
+
+}
+  loadMatches();
+</script>
+<!DOCTYPE html>
+<html>
